@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="inline-size=device-inline-size, initial-scale=1.0">
+    <title>{% block title %}Магазин аксессуаров для велосипедов{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            min-block-size: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            background-color: #444;
+            color: #fff;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
+        .container {
+            inline-size: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            inline-size: 100%;
+            margin-block-start: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CityBikes - Магазин аксессуаров для велосипедов</h1>
+    </header>
+    <nav>
+        <a href="{% url 'home' %}">Главная</a>
+        <a href="{% url 'shop_info' %}">О магазине</a>
+        <a href="{% url 'about' %}">Об авторе</a>
+    </nav>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <footer>
+        &copy; 2024 Магазин аксессуаров для велосипедов
+    </footer>
+</body>
+</html>

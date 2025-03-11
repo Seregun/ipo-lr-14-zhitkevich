@@ -1,0 +1,53 @@
+
+{% extends 'shop/base.html' %}
+
+{% block title %}Главная - Магазин аксессуаров для велосипедов{% endblock %}
+
+{% block content %}
+    <h2>Добро пожаловать в наш магазин велосипедных аксессуаров!</h2>
+    
+    <div style="text-align: center; margin-block-end: 30px;">
+        <p style="font-size: 18px;">Мы предлагаем широкий ассортимент качественных аксессуаров для вашего велосипеда</p>
+    </div>
+    
+    <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px; margin-block-end: 30px;">
+        <h3 style="color: #333; border-block-end: 2px solid #ddd; padding-block-end: 10px;">Наши популярные товары:</h3>
+        <ul style="list-style-type: none; padding-inline-start: 10px;">
+            <li style="margin: 10px 0; padding-inline-start: 25px; position: relative;">
+                <span style="position: absolute; inset-inline-start: 0; color: #4CAF50;">✓</span>
+                Фонари для безопасного движения в тёмное время суток
+            </li>
+            <li style="margin: 10px 0; padding-inline-start: 25px; position: relative;">
+                <span style="position: absolute; inset-inline-start: 0; color: #4CAF50;">✓</span>
+                Надёжные замки для защиты вашего велосипеда
+            </li>
+            <li style="margin: 10px 0; padding-inline-start: 25px; position: relative;">
+                <span style="position: absolute; inset-inline-start: 0; color: #4CAF50;">✓</span>
+                Удобные сумки для перевозки вещей
+            </li>
+            <li style="margin: 10px 0; padding-inline-start: 25px; position: relative;">
+                <span style="position: absolute; inset-inline-start: 0; color: #4CAF50;">✓</span>
+                И многое другое!
+            </li>
+        </ul>
+    </div>
+    
+    <h3 style="text-align: center; margin-block-start: 30px;">Узнайте больше информации:</h3>
+    
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-block-start: 20px; gap: 20px;">
+        <a href="{% url 'shop_info' %}" style="text-decoration: none; flex: 1; min-inline-size: 300px;">
+            <div style="text-align: center; padding: 25px; background-color: #e9f7fe; border-radius: 8px; border: 1px solid #c3e6ff; transition: transform 0.3s, box-shadow 0.3s; block-size: 100%;">
+                <h3 style="color: #0066cc;">О магазине</h3>
+                <p>Узнайте больше о нашем магазине, ассортименте и преимуществах покупок у нас</p>
+                <button style="background-color: #0066cc; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-block-start: 10px;">Подробнее</button>
+            </div>
+        </a>
+        <a href="{% url 'about' %}" style="text-decoration: none; flex: 1; min-inline-size: 300px;">
+            <div style="text-align: center; padding: 25px; background-color: #fff8e1; border-radius: 8px; border: 1px solid #ffe082; transition: transform 0.3s, box-shadow 0.3s; block-size: 100%;">
+                <h3 style="color: #ff8f00;">Об авторе</h3>
+                <p>Информация о разработчике сайта и истории создания проекта</p>
+                <button style="background-color: #ff8f00; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-block-start: 10px;">Подробнее</button>
+            </div>
+        </a>
+    </div>
+{% endblock %}
