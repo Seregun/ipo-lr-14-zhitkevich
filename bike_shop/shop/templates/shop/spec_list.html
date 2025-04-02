@@ -1,0 +1,18 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Список квалификаций</h1>
+    
+    <div class="specs-list">
+        {% for spec in specs %}
+            <div class="spec-item">
+                <h3>{{ spec.title }}</h3>
+                <p><a href="{% url 'spec_detail' spec.id %}" class="btn btn-primary">Подробнее</a></p>
+            </div>
+        {% empty %}
+            <p>Квалификации не найдены</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

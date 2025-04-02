@@ -1,0 +1,14 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ spec.title }}</h1>
+
+    <div class="spec-details">
+        <p><strong>ID:</strong> {{ spec.id }}</p>
+        <p><strong>Описание:</strong> {{ spec.description }}</p>
+        
+        <a href="{% url 'spec_list' %}" class="btn btn-primary">Вернуться к списку</a>
+    </div>
+</div>
+{% endblock %}
