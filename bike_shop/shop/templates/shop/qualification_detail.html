@@ -1,0 +1,12 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{{ qualification.name }}{% endblock %}
+
+{% block content %}
+<div class="qualification-detail">
+    <h2>Квалификация #{{ qualification.qualification_id }}</h2>
+    <h3>{{ qualification.name }}</h3>
+    <p>{{ qualification.description }}</p>
+    <a href="{% url 'qualification_list' %}">Назад к списку</a>
+</div>
+{% endblock %}

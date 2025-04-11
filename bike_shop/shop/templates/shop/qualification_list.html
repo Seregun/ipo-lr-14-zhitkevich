@@ -1,0 +1,27 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Список квалификаций{% endblock %}
+
+{% block content %}
+<div class="qualification-container">
+    <h2>Квалификации</h2>
+    
+    <form method="GET" action="{% url 'qualification_list' %}" class="search-form">
+        <input type="number" name="id" placeholder="Поиск по ID" value="{{ search_id }}">
+        <button type="submit">Поиск</button>
+    </form>
+
+    <div class="qualification-list">
+        {% for qual in qualifications %}
+            <div class="qualification-item">
+                <h3>ID: {{ qual.qualification_id }}</h3>
+                <h4>{{ qual.name }}</h4>
+                <p>{{ qual.description }}</p>
+                <a href="{% url 'qualification_detail' qual.qualification_id %}">Подробнее</a>
+            </div>
+        {% empty %}
+            <p>Квалификации не найдены.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
