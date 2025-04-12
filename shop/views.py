@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from .models import Qualification
+import json
 
 def spec_list(request):
     """Представление для списка специальностей"""
