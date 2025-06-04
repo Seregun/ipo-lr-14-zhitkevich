@@ -3,7 +3,39 @@
 {% block title %}Специальности{% endblock %}
 
 {% block content %}
-    <h2>Список специальностей</h2>
-    <div class="specializations">
+    <h2>Специальности</h2>
+    
+    {% if total_count %}
+        <p>Всего специальностей в базе: {{ total_count }}</p>
+        {% if not search_id %}
+            <p>Показаны первые 50 специальностей. Используйте поиск по ID для поиска конкретной специальности.</p>
+        {% endif %}
+    {% endif %}
+    
+    <form method="GET" action="{% url 'spec_list' %}">
+        <input type="number" name="id" placeholder="Поиск по ID" value="{{ search_id }}">
+        <button type="submit">Поиск</button>
+        {% if search_id %}
+            <a href="{% url 'spec_list' %}">Показать все</a>
+        {% endif %}
+    </form>
+
+    <div class="qualification-list">
+        {% for qual in qualifications %}
+            <div class="qualification-item">
+                <h3>ID: {{ qual.qualification_id }}</h3>
+                <h4>{{ qual.name }}</h4>
+                {% if qual.code %}
+                    <p><strong>Код:</strong> {{ qual.code }}</p>
+                {% endif %}
+                {% if qual.type %}
+                    <p><strong>Тип:</strong> {{ qual.type }}</p>
+                {% endif %}
+                <p>{{ qual.description|truncatewords:20 }}</p>
+                <a href="{% url 'spec_detail' qual.qualification_id %}">Подробнее</a>
+            </div>
+        {% empty %}
+            <p>Специальности не найдены.</p>
+        {% endfor %}
     </div>
 {% endblock %}
