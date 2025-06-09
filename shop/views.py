@@ -8,9 +8,12 @@ from django.conf import settings
 def load_qualifications_from_json():
     """Загружает квалификации из JSON файла"""
     json_path = os.path.join(settings.BASE_DIR, 'attached_assets', 'dump.json')
+    print(f"Ищем файл по пути: {json_path}")
+    print(f"Файл существует: {os.path.exists(json_path)}")  
     try:
         with open(json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
+            print(f"JSON загружен, количество записей: {len(data)}") 
             specialties = []
             for item in data:
                 if item.get('model') == 'data.specialty':
@@ -22,8 +25,10 @@ def load_qualifications_from_json():
                         'type': item['fields'].get('c_type', '')
                     }
                     specialties.append(specialty)
+            print(f"Найдено специальностей: {len(specialties)}")
             return specialties
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Ошибка: {e}")
         return []
 def spec_list(request):
     """Представление для списка квалификаций с поиском по ID"""
