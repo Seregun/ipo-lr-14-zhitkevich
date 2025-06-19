@@ -32,7 +32,6 @@
                     <p><strong>Тип:</strong> {{ qual.type }}</p>
                 {% endif %}
                 <p>{{ qual.description|truncatewords:20 }}</p>
-                <a href="{% url 'spec_detail' qual.qualification_id %}">Подробнее</a>
             </div>
         {% empty %}
             <p>Специальности не найдены.</p>

@@ -7,7 +7,7 @@ from django.conf import settings
 
 def load_qualifications_from_json():
     """Загружает квалификации из JSON файла"""
-    json_path = os.path.join(settings.BASE_DIR, 'attached_assets', 'dump.json')
+    json_path = os.path.join(settings.BASE_DIR, '', 'dump.json')
     print(f"Ищем файл по пути: {json_path}")
     print(f"Файл существует: {os.path.exists(json_path)}")  
     try:
