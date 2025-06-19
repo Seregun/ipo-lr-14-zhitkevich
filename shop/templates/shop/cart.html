@@ -1,0 +1,141 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Корзина - CityBikes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Моя корзина</h1>
+            
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'products_list' %}">Каталог товаров</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Корзина</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    {% if cart_items %}
+        <div class="row">
+            <div class="col-lg-8">
+
+                {% for item in cart_items %}
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-3">
+                                {% if item.товар.фото_товара %}
+                                    <img src="{{ item.товар.фото_товара.url }}" class="img-fluid rounded-start h-100" alt="{{ item.товар.название }}" style="object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light rounded-start h-100 d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-9">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="card-title">
+                                                <a href="{% url 'product_detail' item.товар.id %}" class="text-decoration-none">
+                                                    {{ item.товар.название }}
+                                                </a>
+                                            </h5>
+                                            <p class="card-text text-muted small">{{ item.товар.описание|truncatewords:10 }}</p>
+                                            <p class="card-text">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-tag"></i> {{ item.товар.категория.название }}
+                                                    <br>
+                                                    <i class="fas fa-industry"></i> {{ item.товар.производитель.название }}
+                                                </small>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <p class="mb-1">
+                                                <strong>{{ item.товар.цена }}₽</strong> × {{ item.количество }}
+                                            </p>
+                                            <p class="h5 text-primary">{{ item.стоимость_элемента }}₽</p>
+                                            
+                                            <form method="post" action="{% url 'update_cart_item' item.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <div class="input-group input-group-sm mb-2" style="max-inline-size: 120px; margin-inline-start: auto;">
+                                                    <input type="number" class="form-control" name="quantity" 
+                                                           value="{{ item.количество }}" min="1" max="{{ item.товар.количество_на_складе }}">
+                                                    <button class="btn btn-outline-primary" type="submit">
+                                                        <i class="fas fa-sync-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            
+                                            <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-outline-danger btn-sm" 
+                                               onclick="return confirm('Удалить товар из корзины?')">
+                                                <i class="fas fa-trash"></i> Удалить
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="col-lg-4">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Итоги заказа</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Товаров в корзине:</span>
+                            <span>{{ cart_items.count }} шт.</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Общая стоимость:</strong>
+                            <strong class="text-primary">{{ cart.общая_стоимость }}₽</strong>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" disabled>
+                                <i class="fas fa-credit-card"></i> Оформить заказ
+                            </button>
+                            <small class="text-muted text-center">
+                                (Функция оформления заказа в разработке)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title">Информация</h6>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-truck text-muted"></i> Бесплатная доставка от 3000₽</li>
+                            <li><i class="fas fa-undo text-muted"></i> Возврат в течение 14 дней</li>
+                            <li><i class="fas fa-shield-alt text-muted"></i> Гарантия производителя</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-5x text-muted mb-3"></i>
+                    <h3>Ваша корзина пуста</h3>
+                    <p class="text-muted">Добавьте товары из каталога, чтобы они появились здесь</p>
+                    <a href="{% url 'products_list' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Перейти к покупкам
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
