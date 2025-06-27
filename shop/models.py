@@ -53,7 +53,7 @@ class Product(models.Model):
         verbose_name_plural = "Товары"
     
     def save(self, *args, **kwargs):
-        self.full_clean()  # Вызываем валидацию перед сохранением
+        self.full_clean() 
         super().save(*args, **kwargs)
     
     def __str__(self):
