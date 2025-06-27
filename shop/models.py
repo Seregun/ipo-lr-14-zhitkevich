@@ -10,8 +10,12 @@ class Category(models.Model):
     название = models.CharField(max_length=100)
     описание = models.TextField(blank=True)
     
+    class Meta:
+        verbose_name = "Категория товара"
+        verbose_name_plural = "Категории товаров"
+    
     def __str__(self):
-        return str(self.название)
+        return self.название
 
 
 class Manufacturer(models.Model):
@@ -20,8 +24,12 @@ class Manufacturer(models.Model):
     страна = models.CharField(max_length=100)
     описание = models.TextField(blank=True)
     
+    class Meta:
+        verbose_name = "Производитель"
+        verbose_name_plural = "Производители"
+    
     def __str__(self):
-        return str(self.название)
+        return self.название
 
 
 class Product(models.Model):
@@ -40,46 +48,86 @@ class Product(models.Model):
     категория = models.ForeignKey(Category, on_delete=models.CASCADE)
     производитель = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
     
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+    
     def save(self, *args, **kwargs):
-        self.full_clean() 
+        self.full_clean()  # Вызываем валидацию перед сохранением
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return str(self.название)
+        return self.название
 
 
 class Cart(models.Model):
-    """Модель корзины"""
-    пользователь = models.OneToOneField(User, on_delete=models.CASCADE)
-    дата_создания = models.DateTimeField(auto_now_add=True)
+    """Модель корзины покупателя"""
+    пользователь = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="корзина"
+    )
+    дата_создания = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата создания"
+    )
+    
+    class Meta:
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзины"
+        db_table = "shop_cart"
     
     def __str__(self):
         return f"Корзина пользователя {self.пользователь.username}"
     
     def общая_стоимость(self):
-        """Вычисляет общую стоимость всех элементов в корзине"""
-        total = sum(item.стоимость_элемента() for item in self.cartitem_set.all())
-        return total
+        """Вычисляет общую стоимость корзины"""
+        return sum(item.стоимость_элемента() for item in self.элементы.all())
+    
+    def количество_товаров(self):
+        """Возвращает общее количество товаров в корзине"""
+        return sum(item.количество for item in self.элементы.all())
 
 
 class CartItem(models.Model):
     """Модель элемента корзины"""
-    корзина = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    товар = models.ForeignKey(Product, on_delete=models.CASCADE)
-    количество = models.PositiveIntegerField()
+    корзина = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        verbose_name="Корзина",
+        related_name="элементы"
+    )
+    товар = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        verbose_name="Товар"
+    )
+    количество = models.PositiveIntegerField(
+        verbose_name="Количество"
+    )
+    добавлен = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата добавления"
+    )
+    
+    class Meta:
+        verbose_name = "Элемент корзины"
+        verbose_name_plural = "Элементы корзины"
+        unique_together = ('корзина', 'товар')
     
     def __str__(self):
         return f"{self.товар.название} ({self.количество} шт.)"
     
     def стоимость_элемента(self):
-        """Возвращает стоимость данного элемента корзины"""
+        """Возвращает товар.цена * количество"""
         return self.товар.цена * self.количество
     
     def clean(self):
-        """Валидация: количество не должно превышать количество на складе"""
-        if self.количество > self.товар.количество_на_складе:
+        """Валидация: количество не должно превышать товар.количество_на_складе"""
+        if self.товар and self.количество > self.товар.количество_на_складе:
             raise ValidationError(
-                f'Количество {self.количество} превышает доступное на складе ({self.товар.количество_на_складе})'
+                f"Количество не должно превышать остаток на складе ({self.товар.количество_на_складе})"
             )
     
     def save(self, *args, **kwargs):
@@ -88,9 +136,13 @@ class CartItem(models.Model):
 
 
 class Qualification(models.Model):
-    qualification_id = models.IntegerField()
+    qualification_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=200, default='')
     description = models.TextField(default='')
+    
+    class Meta:
+        verbose_name = "Квалификация"
+        verbose_name_plural = "Квалификации"
     
     def __str__(self):
         return str(self.name)
