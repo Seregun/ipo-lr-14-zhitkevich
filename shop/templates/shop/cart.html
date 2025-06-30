@@ -8,10 +8,19 @@
         <div class="col-12">
             <h1 class="mb-4">Моя корзина</h1>
             
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'products_list' %}">Каталог товаров</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Каталог товаров</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Корзина</li>
                 </ol>
             </nav>
@@ -26,8 +35,8 @@
                     <div class="card mb-3">
                         <div class="row g-0">
                             <div class="col-md-3">
-                                {% if item.товар.фото_товара %}
-                                    <img src="{{ item.товар.фото_товара.url }}" class="img-fluid rounded-start h-100" alt="{{ item.товар.название }}" style="object-fit: cover;">
+                                {% if item.product.фото_товара %}
+                                    <img src="{{ item.product.фото_товара.url }}" class="img-fluid rounded-start h-100" alt="{{ item.product.название }}" style="object-fit: cover;">
                                 {% else %}
                                     <div class="bg-light rounded-start h-100 d-flex align-items-center justify-content-center">
                                         <i class="fas fa-image fa-2x text-muted"></i>
@@ -43,26 +52,26 @@
                                                     {{ item.товар.название }}
                                                 </a>
                                             </h5>
-                                            <p class="card-text text-muted small">{{ item.товар.описание|truncatewords:10 }}</p>
+                                            <p class="card-text text-muted small">{{ item.product.описание|truncatewords:10 }}</p>
                                             <p class="card-text">
                                                 <small class="text-muted">
-                                                    <i class="fas fa-tag"></i> {{ item.товар.категория.название }}
+                                                    <i class="fas fa-tag"></i> {{ item.product.категория.название }}
                                                     <br>
-                                                    <i class="fas fa-industry"></i> {{ item.товар.производитель.название }}
+                                                    <i class="fas fa-industry"></i> {{ item.product.производитель.название }}
                                                 </small>
                                             </p>
                                         </div>
                                         <div class="col-md-4 text-end">
                                             <p class="mb-1">
-                                                <strong>{{ item.товар.цена }}₽</strong> × {{ item.количество }}
+                                                <strong>{{ item.product.цена }}₽</strong> × {{ item.quantity }}
                                             </p>
-                                            <p class="h5 text-primary">{{ item.стоимость_элемента }}₽</p>
+                                            <p class="h5 text-primary">{{ item.total_price }}₽</p>
                                             
                                             <form method="post" action="{% url 'update_cart_item' item.id %}" class="d-inline">
                                                 {% csrf_token %}
                                                 <div class="input-group input-group-sm mb-2" style="max-inline-size: 120px; margin-inline-start: auto;">
                                                     <input type="number" class="form-control" name="quantity" 
-                                                           value="{{ item.количество }}" min="1" max="{{ item.товар.количество_на_складе }}">
+                                                        value="{{ item.quantity }}" min="1" max="{{ item.product.количество_на_складе }}">
                                                     <button class="btn btn-outline-primary" type="submit">
                                                         <i class="fas fa-sync-alt"></i>
                                                     </button>
@@ -70,7 +79,7 @@
                                             </form>
                                             
                                             <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-outline-danger btn-sm" 
-                                               onclick="return confirm('Удалить товар из корзины?')">
+                                            onclick="return confirm('Удалить товар из корзины?')">
                                                 <i class="fas fa-trash"></i> Удалить
                                             </a>
                                         </div>
@@ -130,7 +139,7 @@
                     <i class="fas fa-shopping-cart fa-5x text-muted mb-3"></i>
                     <h3>Ваша корзина пуста</h3>
                     <p class="text-muted">Добавьте товары из каталога, чтобы они появились здесь</p>
-                    <a href="{% url 'products_list' %}" class="btn btn-primary">
+                    <a href="{% url 'product_list' %}" class="btn btn-primary">
                         <i class="fas fa-arrow-left"></i> Перейти к покупкам
                     </a>
                 </div>

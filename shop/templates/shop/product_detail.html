@@ -6,11 +6,10 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'products_list' %}">Каталог товаров</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Каталог товаров</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ product.название }}</li>
                 </ol>
             </nav>
@@ -19,9 +18,8 @@
     
     <div class="row">
         <div class="col-lg-6">
-
             {% if product.фото_товара %}
-                <img src="{{ product.фото_товара.url }}" class="img-fluid rounded shadow" alt="{{ product.название }}">
+                <img src="{{ product.фото_товара.url }}" class="img-fluid rounded shadow" alt="{{ product.название }}" style="max-block-size: 400px; inline-size: 100%; object-fit: contain;">
             {% else %}
                 <div class="bg-light rounded shadow d-flex align-items-center justify-content-center" style="block-size: 400px;">
                     <i class="fas fa-image fa-5x text-muted"></i>
@@ -30,7 +28,6 @@
         </div>
         
         <div class="col-lg-6">
-
             <div class="ps-lg-4">
                 <h1 class="mb-3">{{ product.название }}</h1>
                 
@@ -71,20 +68,21 @@
                     {% endif %}
                 {% else %}
                     <div class="alert alert-info">
-                        <p><i class="fas fa-info-circle"></i> <a href="/admin/login/">Войдите в систему</a>, чтобы добавить товар в корзину</p>
+                        <p>
+                            <i class="fas fa-info-circle"></i> 
+                            <a href="{% url 'login' %}">Войдите</a> или 
+                            <a href="{% url 'register' %}">зарегистрируйтесь</a>, 
+                            чтобы добавлять товары в корзину
+                        </p>
                     </div>
                 {% endif %}
                 
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">Информация о производителе</h5>
+                        <h5 class="mb-0">Описание товара</h5>
                     </div>
                     <div class="card-body">
-                        <p><strong>Производитель:</strong> {{ product.производитель.название }}</p>
-                        <p><strong>Страна:</strong> {{ product.производитель.страна }}</p>
-                        {% if product.производитель.описание %}
-                            <p><strong>О производителе:</strong> {{ product.производитель.описание }}</p>
-                        {% endif %}
+                        <p>{{ product.описание }}</p>
                     </div>
                 </div>
             </div>
@@ -93,13 +91,12 @@
     
     <div class="row mt-5">
         <div class="col-12">
-
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Описание товара</h5>
                 </div>
                 <div class="card-body">
-                    <p>{{ product.описание }}</p>
+                    <p>{{ product.description }}</p>
                 </div>
             </div>
         </div>
@@ -107,11 +104,11 @@
     
     <div class="row mt-4">
         <div class="col-12">
-            <a href="{% url 'products_list' %}" class="btn btn-outline-secondary">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Вернуться к каталогу
             </a>
             {% if user.is_authenticated %}
-                <a href="{% url 'cart_view' %}" class="btn btn-outline-primary ms-2">
+                <a href="{% url 'cart' %}" class="btn btn-outline-primary ms-2">
                     <i class="fas fa-shopping-cart"></i> Моя корзина
                 </a>
             {% endif %}

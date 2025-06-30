@@ -47,16 +47,16 @@
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                            <a href="{% url 'products_list' %}" class="btn btn-outline-secondary">Сбросить</a>
+                            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">Сбросить</a>
                         </div>
                     </form>
                 </div>
             </div>
             
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <p class="text-muted mb-0">Найдено товаров: {{ total_products }}</p>
+                <p class="text-muted mb-0">Найдено товаров: {{ page_obj.paginator.count }}</p>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'cart_view' %}" class="btn btn-outline-primary">
+                    <a href="{% url 'cart' %}" class="btn btn-outline-primary">
                         <i class="fas fa-shopping-cart"></i> Корзина
                     </a>
                 {% endif %}
@@ -115,35 +115,35 @@
                     </div>
                 {% endfor %}
             </div>
-            
+
             {% if page_obj.has_other_pages %}
-                <nav aria-label="Навигация по страницам">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
+            <nav aria-label="Навигация по страницам">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_manufacturer %}manufacturer={{ current_manufacturer }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_manufacturer %}manufacturer={{ current_manufacturer }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                                <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_manufacturer %}manufacturer={{ current_manufacturer }}&{% endif %}sort={{ current_sort }}&page={{ num }}">{{ num }}</a>
                             </li>
                         {% endif %}
-                        
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_manufacturer %}manufacturer={{ current_manufacturer }}&{% endif %}sort={{ current_sort }}&page={{ num }}">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_manufacturer %}manufacturer={{ current_manufacturer }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.next_page_number }}">Следующая</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_manufacturer %}manufacturer={{ current_manufacturer }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.next_page_number }}">Следующая</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% endif %}
         </div>
     </div>

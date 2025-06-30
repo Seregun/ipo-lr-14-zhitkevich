@@ -1,0 +1,16 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Профиль пользователя {{ user.username }}</h2>
+    <div class="card mt-3">
+        <div class="card-body">
+            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email|default:"Не указан" }}</p>
+            <a href="{% url 'home' %}" class="btn btn-primary mt-2">На главную</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
