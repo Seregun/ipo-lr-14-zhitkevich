@@ -48,8 +48,8 @@
                                     <div class="row">
                                         <div class="col-md-8">
                                             <h5 class="card-title">
-                                                <a href="{% url 'product_detail' item.товар.id %}" class="text-decoration-none">
-                                                    {{ item.товар.название }}
+                                                <a href="{% url 'product_detail' item.product.id %}" class="text-decoration-none">
+                                                    {{ item.product.название }}
                                                 </a>
                                             </h5>
                                             <p class="card-text text-muted small">{{ item.product.описание|truncatewords:10 }}</p>

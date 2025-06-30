@@ -75,6 +75,13 @@ def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     quantity = int(request.POST.get('quantity', 1))
     
+    if not request.user.is_authenticated:
+        cart = request.session.get('cart', {})
+        cart[str(product_id)] = cart.get(str(product_id), 0) + quantity
+        request.session['cart'] = cart
+        messages.success(request, f'Товар "{product.название}" добавлен в корзину!')
+        return redirect('product_detail', product_id=product_id)
+    
     cart, created = Cart.objects.get_or_create(пользователь=request.user)
     
     cart_item, item_created = CartItem.objects.get_or_create(
@@ -88,35 +95,78 @@ def add_to_cart(request, product_id):
         cart_item.save()
     
     messages.success(request, f'Товар "{product.название}" добавлен в корзину!')
-    return redirect('shop:cart')  
+    return redirect('product_detail', product_id=product_id)
 
 @login_required
 def cart_view(request):
-    try:
-        cart = Cart.objects.get(пользователь=request.user)
-        cart_items = cart.элементы.all()
-        total_price = cart.общая_стоимость()
-    except ObjectDoesNotExist:
-        cart = None
-        cart_items = []
-        total_price = 0
+    cart_items = []
+    total_price = 0
+    
+    if not request.user.is_authenticated:
+        cart = request.session.get('cart', {})
+        for product_id, quantity in cart.items():
+            try:
+                product = Product.objects.get(id=product_id)
+                item_total = product.цена * quantity
+                total_price += item_total
+                cart_items.append({
+                    'id': product_id,
+                    'product': product,
+                    'quantity': quantity,
+                    'total_price': item_total
+                })
+            except Product.DoesNotExist:
+                if product_id in cart:
+                    del cart[product_id]
+                    request.session['cart'] = cart
+    
+    else:
+        try:
+            cart = Cart.objects.get(пользователь=request.user)
+            for item in cart.элементы.all():
+                item_total = item.стоимость_элемента()
+                total_price += item_total
+                cart_items.append({
+                    'id': item.id,
+                    'product': item.товар,
+                    'quantity': item.количество,
+                    'total_price': item_total
+                })
+        except Cart.DoesNotExist:
+            pass
     
     return render(request, 'shop/cart.html', {
-        'cart': cart,
         'cart_items': cart_items,
         'total_price': total_price
     })
 
 @login_required
 def remove_from_cart(request, item_id):
+    if not request.user.is_authenticated:
+        cart = request.session.get('cart', {})
+        if str(item_id) in cart:
+            del cart[str(item_id)]
+            request.session['cart'] = cart
+        return redirect('cart')
+    
     cart_item = get_object_or_404(CartItem, id=item_id, корзина__пользователь=request.user)
     product_name = cart_item.товар.название
     cart_item.delete()
     messages.success(request, f'Товар "{product_name}" удален из корзины')
-    return redirect('cart_view')
+    return redirect('cart')
 
 @login_required
 def update_cart_item(request, item_id):
+    if not request.user.is_authenticated:
+        cart = request.session.get('cart', {})
+        quantity = int(request.POST.get('quantity', 1))
+        
+        if str(item_id) in cart:
+            cart[str(item_id)] = quantity
+            request.session['cart'] = cart
+        
+        return redirect('cart')
+    
     cart_item = get_object_or_404(CartItem, id=item_id, корзина__пользователь=request.user)
     quantity = int(request.POST.get('quantity', 1))
     
@@ -127,7 +177,7 @@ def update_cart_item(request, item_id):
     else:
         messages.error(request, f'Недопустимое количество. Максимум: {cart_item.товар.количество_на_складе}')
     
-    return redirect('cart_view')
+    return redirect('cart')
 
 @login_required
 def profile_view(request):
