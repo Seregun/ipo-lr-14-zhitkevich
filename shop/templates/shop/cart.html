@@ -30,7 +30,6 @@
     {% if cart_items %}
         <div class="row">
             <div class="col-lg-8">
-
                 {% for item in cart_items %}
                     <div class="card mb-3">
                         <div class="row g-0">
@@ -52,17 +51,7 @@
                                                     {{ item.product.название }}
                                                 </a>
                                             </h5>
-                                            <p class="card-text text-muted small">{{ item.product.описание|truncatewords:10 }}</p>
                                             <p class="card-text">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-tag"></i> {{ item.product.категория.название }}
-                                                    <br>
-                                                    <i class="fas fa-industry"></i> {{ item.product.производитель.название }}
-                                                </small>
-                                            </p>
-                                        </div>
-                                        <div class="col-md-4 text-end">
-                                            <p class="mb-1">
                                                 <strong>{{ item.product.цена }}₽</strong> × {{ item.quantity }}
                                             </p>
                                             <p class="h5 text-primary">{{ item.total_price }}₽</p>
@@ -71,15 +60,16 @@
                                                 {% csrf_token %}
                                                 <div class="input-group input-group-sm mb-2" style="max-inline-size: 120px; margin-inline-start: auto;">
                                                     <input type="number" class="form-control" name="quantity" 
-                                                        value="{{ item.quantity }}" min="1" max="{{ item.product.количество_на_складе }}">
+                                                           value="{{ item.quantity }}" min="1" max="{{ item.product.количество_на_складе }}">
                                                     <button class="btn btn-outline-primary" type="submit">
                                                         <i class="fas fa-sync-alt"></i>
                                                     </button>
                                                 </div>
                                             </form>
-                                            
+                                        </div>
+                                        <div class="col-md-4 text-end">
                                             <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-outline-danger btn-sm" 
-                                            onclick="return confirm('Удалить товар из корзины?')">
+                                               onclick="return confirm('Удалить товар из корзины?')">
                                                 <i class="fas fa-trash"></i> Удалить
                                             </a>
                                         </div>
@@ -92,7 +82,6 @@
             </div>
             
             <div class="col-lg-4">
-
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Итоги заказа</h5>
@@ -100,39 +89,24 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Товаров в корзине:</span>
-                            <span>{{ cart_items.count }} шт.</span>
+                            <span>{{ cart_items|length }} шт.</span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <strong>Общая стоимость:</strong>
-                            <strong class="text-primary">{{ cart.общая_стоимость }}₽</strong>
+                            <strong class="text-primary">{{ total_price }}₽</strong>
                         </div>
                         
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary btn-lg" disabled>
+                            <a href="{% url 'checkout' %}" class="btn btn-success btn-lg">
                                 <i class="fas fa-credit-card"></i> Оформить заказ
-                            </button>
-                            <small class="text-muted text-center">
-                                (Функция оформления заказа в разработке)
-                            </small>
+                            </a>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h6 class="card-title">Информация</h6>
-                        <ul class="list-unstyled small">
-                            <li><i class="fas fa-truck text-muted"></i> Бесплатная доставка от 3000₽</li>
-                            <li><i class="fas fa-undo text-muted"></i> Возврат в течение 14 дней</li>
-                            <li><i class="fas fa-shield-alt text-muted"></i> Гарантия производителя</li>
-                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     {% else %}
-
         <div class="row">
             <div class="col-12">
                 <div class="text-center py-5">

@@ -1,0 +1,69 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Оформление заказа - CityBikes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Оформление заказа</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Данные для доставки</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" 
+                                   value="{{ user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Телефон</label>
+                            <input type="tel" class="form-control" name="phone_number" 
+                                   placeholder="+375 (XX) XXX-XX-XX" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Адрес доставки</label>
+                            <textarea class="form-control" name="delivery_address" 
+                                      rows="3" required placeholder="Город, улица, дом, квартира"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Примечания</label>
+                            <textarea class="form-control" name="notes" 
+                                      rows="2" placeholder="Комментарии к доставке"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            Подтвердить заказ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Ваш заказ</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for item in cart_items %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ item.товар.название }} × {{ item.количество }}</span>
+                                <span>{{ item.стоимость_элемента }}₽</span>
+                            </li>
+                        {% endfor %}
+                        <li class="list-group-item list-group-item-primary fw-bold d-flex justify-content-between">
+                            <span>Итого:</span>
+                            <span>{{ total_price }}₽</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

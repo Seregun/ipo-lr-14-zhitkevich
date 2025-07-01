@@ -1,7 +1,9 @@
-from .models import Category, Manufacturer, Product, Cart, CartItem
+from django.core.mail import EmailMessage, send_mail
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Cart, CartItem, Qualification
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Category, Manufacturer, Product, Cart, CartItem
+from .models import Product, Cart, CartItem, Qualification, Order, OrderItem
 from django.core.exceptions import ObjectDoesNotExist
 import json
 import os
@@ -11,7 +13,14 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+import openpyxl
+from io import BytesIO
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.http import HttpResponse
+from django.contrib import messages
+from django.conf import settings
 
 
 def home(request):
@@ -24,6 +33,7 @@ def shop_info(request):
     return render(request, 'shop/shop_info.html')
 
 def product_list(request):
+    from .models import Product, Category, Manufacturer
     products = Product.objects.all()
     
     search_query = request.GET.get('search', '')
@@ -68,6 +78,7 @@ def product_list(request):
     return render(request, 'shop/product_list.html', context)
 
 def product_detail(request, product_id):
+    from .models import Product
     product = get_object_or_404(Product, id=product_id)
     return render(request, 'shop/product_detail.html', {'product': product})
 
@@ -238,3 +249,120 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'shop/register.html', {'form': form})
+
+@login_required
+def checkout(request):
+    from .models import Cart, CartItem, Order, OrderItem
+    from django.core.mail import EmailMessage
+    from django.conf import settings
+    from io import BytesIO
+    import openpyxl
+    from django.contrib import messages
+
+    try:
+        cart = Cart.objects.get(пользователь=request.user)
+        cart_items = cart.элементы.all()
+        total_price = cart.общая_стоимость()
+    except Cart.DoesNotExist:
+        messages.error(request, "Ваша корзина пуста")
+        return redirect('cart')
+    
+    if request.method == 'POST':
+        delivery_address = request.POST.get('delivery_address', '')
+        phone_number = request.POST.get('phone_number', '')
+        email = request.POST.get('email', request.user.email)
+        notes = request.POST.get('notes', '')
+        
+        order = Order.objects.create(
+            пользователь=request.user,
+            delivery_address=delivery_address,
+            phone_number=phone_number,
+            email=email,
+            notes=notes,
+            total_price=total_price
+        )
+        
+        for item in cart_items:
+            OrderItem.objects.create(
+                заказ=order,
+                товар=item.товар,
+                количество=item.количество,
+                цена=item.товар.цена
+            )
+            
+            product = item.товар
+            product.количество_на_складе -= item.количество
+            product.save()
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Чек заказа"
+        headers = ["Товар", "Количество", "Цена за единицу", "Сумма"]
+        ws.append(headers)
+        
+        for item in order.элементы.all():
+            ws.append([
+                item.товар.название,
+                item.количество,
+                item.цена,
+                item.количество * item.цена
+            ])
+        
+        ws.append(["", "", "Итого:", order.total_price])
+        
+        buffer = BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+        excel_data = buffer.getvalue()
+        
+        subject = f'Чек заказа №{order.id}'
+        message = f'''
+        Спасибо за ваш заказ!
+        Номер заказа: {order.id}
+        Дата: {order.дата_создания.strftime("%d.%m.%Y %H:%M")}
+        Адрес доставки: {delivery_address}
+        Телефон: {phone_number}
+        Общая сумма: {total_price}₽
+        
+        Состав заказа:
+        '''
+        for item in order.элементы.all():
+            message += f"\n- {item.товар.название}: {item.количество} × {item.цена}₽"
+        
+        message += f"\n\nИтого: {total_price}₽"
+        
+        email_msg = EmailMessage(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+        )
+        email_msg.attach(
+            f'checkout_{order.id}.xlsx', 
+            excel_data, 
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        email_msg.send()
+        
+        cart_items.delete()
+        cart.delete()
+        
+        order_items = []
+        for item in order.элементы.all():
+            order_items.append({
+                'product': item.товар,
+                'quantity': item.количество,
+                'price': item.цена,
+                'total': item.количество * item.цена
+            })
+        
+        return render(request, 'shop/order_success.html', {
+            'order': order,
+            'order_items': order_items
+        })
+    
+    return render(request, 'shop/checkout.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'user': request.user
+    })
