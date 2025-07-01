@@ -23,7 +23,7 @@ from shop.views import register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('shop.urls')),
+    path('', include('shop.urls')),  
     path('accounts/login/', auth_views.LoginView.as_view(template_name='shop/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('accounts/register/', register, name='register'),

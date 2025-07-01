@@ -21,7 +21,49 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.contrib import messages
 from django.conf import settings
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import Product, Category, Manufacturer, Cart, CartItem
+from .serializers import (
+    ProductSerializer, 
+    CategorySerializer, 
+    ManufacturerSerializer,
+    CartSerializer,
+    CartItemSerializer
+)
 
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+class ManufacturerViewSet(viewsets.ModelViewSet):
+    queryset = Manufacturer.objects.all()
+    serializer_class = ManufacturerSerializer
+    permission_classes = [IsAuthenticated]
+
+class CartViewSet(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Cart.objects.filter(пользователь=self.request.user)
+    
+    queryset = Cart.objects.none()
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return CartItem.objects.filter(корзина__пользователь=self.request.user)
+    
+    queryset = CartItem.objects.none()
 
 def home(request):
     return render(request, 'shop/home.html')
